@@ -47,13 +47,13 @@ data:
       },
       {
         "connectorName": "CTAG",
-        "managementUrl": "https://${NLB_ADDRESS}/ctag-group/cp/api/management",
-        "defaultUrl": "https://${NLB_ADDRESS}/ctag-group/health/api",
-        "protocolUrl": "http://ctag-group-controlplane:8082/api/dsp",
+        "managementUrl": "https://${NLB_ADDRESS}/provider-manufacturing/cp/api/management",
+        "defaultUrl": "https://${NLB_ADDRESS}/provider-manufacturing/health/api",
+        "protocolUrl": "http://provider-manufacturing-controlplane:8082/api/dsp",
         "apiToken": "${EDC_AUTH_KEY}",
-        "controlUrl": "http://ctag-group-controlplane:8083/api/control",
+        "controlUrl": "http://provider-manufacturing-controlplane:8083/api/control",
         "federatedCatalogEnabled": false,
-        "federatedCatalogUrl": "https://${NLB_ADDRESS}/ctag-group/fc/api/catalog",
+        "federatedCatalogUrl": "https://${NLB_ADDRESS}/provider-manufacturing/fc/api/catalog",
         "did": "did:web:provider-identityhub%3A7083:provider"
       }
     ]
