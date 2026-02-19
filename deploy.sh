@@ -144,7 +144,7 @@ function deploy_blueprint_mvd {
     #     git clone https://github.com/eclipse-edc/MinimumViableDataspace.git
     # fi
 
-    # cd MinimumViableDataspace/
+    cd MinimumViableDataspace/
     # git checkout "${MVD_COMMIT}"
 
     # Build MVD container images
