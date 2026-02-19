@@ -210,7 +210,7 @@ function deploy_blueprint_mvd {
         git clone https://github.com/ctag-its-cloud/data-space-dashboard.git
     fi
 
-    cd DataDashboard/
+    cd data-space-dashboard/
     git checkout "${DATA_DASHBOARD_COMMIT}"
 
     # Build DataDashboard container image
