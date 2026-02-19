@@ -31,10 +31,10 @@ module "provider-qna-connector" {
   useSVE        = var.useSVE
 }
 
-# Second provider connector "provider-manufacturing"
-module "provider-manufacturing-connector" {
+# Second provider connector "ctag-group"
+module "ctag-group-connector" {
   source            = "./modules/connector"
-  humanReadableName = "provider-manufacturing"
+  humanReadableName = "ctag-group"
   participantId     = var.provider-did
   database = {
     user     = "postgres"

@@ -20,8 +20,8 @@
 ## Seed application DATA to both connectors
 echo
 echo
-echo "Seed data to 'provider-qna' and 'provider-manufacturing'"
-for url in 'https://NLB_ADDRESS/provider-manufacturing/cp' 'https://NLB_ADDRESS/provider-qna/cp'
+echo "Seed data to 'provider-qna' and 'ctag-group'"
+for url in 'https://NLB_ADDRESS/ctag-group/cp' 'https://NLB_ADDRESS/provider-qna/cp'
 do
   newman run \
     --folder "Seed" \
@@ -38,7 +38,7 @@ newman run \
   --folder "Seed Catalog Server" \
   --env-var "HOST=https://NLB_ADDRESS/provider-catalog-server/cp" \
   --env-var "PROVIDER_QNA_DSP_URL=http://provider-qna-controlplane:8082" \
-  --env-var "PROVIDER_MF_DSP_URL=http://provider-manufacturing-controlplane:8082" \
+  --env-var "PROVIDER_MF_DSP_URL=http://ctag-group-controlplane:8082" \
   ./deployment/postman/MVD.postman_collection.json \
   --insecure
 
