@@ -206,11 +206,11 @@ function deploy_blueprint_mvd {
 
     cd ../
 
-    if [ ! -d "DataDashboard" ]; then
+    if [ ! -d "data-space-dashboard" ]; then
         git clone https://github.com/ctag-its-cloud/data-space-dashboard.git
     fi
 
-    cd DataDashboard/
+    cd data-space-dashboard/
     git checkout "${DATA_DASHBOARD_COMMIT}"
 
     # Build DataDashboard container image
@@ -235,7 +235,7 @@ function delete_mvd {
 
     if [ -d "tutorial-resources" ];     then rm -rf tutorial-resources; fi
     if [ -d "MinimumViableDataspace" ]; then rm -rf MinimumViableDataspace; fi
-    if [ -d "DataDashboard" ];          then rm -rf DataDashboard; fi
+    if [ -d "data-space-dashboard" ];          then rm -rf data-space-dashboard; fi
 
     echo -e "${CY}Minimum Viable Dataspace on AWS was deleted successfully.${NC}"
 }
