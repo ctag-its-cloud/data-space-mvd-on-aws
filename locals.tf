@@ -8,7 +8,7 @@ locals {
 
   vpc_cidr             = "192.168.0.0/16"
   cluster_service_cidr = "10.96.0.0/16"
-  azs                  = slice(data.aws_availability_zones.available.names, 0, 3)
+  azs                  = slice(data.aws_availability_zones.available.names, 0, 2)
 
   mxd_repositories = [
     "${var.name}-backend-service"

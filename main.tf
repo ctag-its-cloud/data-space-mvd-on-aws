@@ -17,7 +17,7 @@ resource "random_string" "this" {
 
 module "eks" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=c41b58277ab3951eca8d11863edf178135ec7654"  # commit hash of version 21.10.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=c41b58277ab3951eca8d11863edf178135ec7654" # commit hash of version 21.10.1
 
   name                   = var.name
   kubernetes_version     = local.cluster_version
@@ -32,7 +32,7 @@ module "eks" {
       pod_identity_association = [
         {
           service_account = "ebs-csi-controller-sa"
-          role_arn = aws_iam_role.ebs_csi_driver.arn
+          role_arn        = aws_iam_role.ebs_csi_driver.arn
         }
       ]
     }
@@ -79,7 +79,7 @@ module "eks" {
   eks_managed_node_groups = {
     mng_ondemand = {
       instance_types = ["t3a.medium"]
-#     capacity_type  = "SPOT"
+      capacity_type  = "SPOT"
 
       min_size     = 1
       max_size     = 3
@@ -94,7 +94,6 @@ module "eks" {
             iops                  = 3000
             throughput            = 125
             encrypted             = true
-            kms_key_id            = module.ebs_kms_key.key_arn
             delete_on_termination = true
           }
         }
@@ -144,24 +143,6 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
 
-module "ebs_kms_key" {
-
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-kms.git?ref=926e8c8aac77189686262b6f95e8e6bedcc9acfa"  # commit hash of version 4.1.1
-
-  aliases     = ["eks/${var.name}/ebs"]
-  description = "Customer managed key to encrypt EKS managed node group volumes"
-
-  key_administrators = [
-    local.admin_principal
-  ]
-
-  key_service_roles_for_autoscaling = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
-    module.eks.cluster_iam_role_arn,
-  ]
-
-  tags = local.tags
-}
 
 data "aws_rds_engine_version" "postgresql" {
   engine  = "aurora-postgresql"
@@ -175,7 +156,7 @@ resource "random_password" "alice" {
 
 module "rds-aurora-alice" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=e0462445344641c69e36dc90f7f96ba18b2cc19e"  # commit hash of version 10.0.2
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=e0462445344641c69e36dc90f7f96ba18b2cc19e" # commit hash of version 10.0.2
 
   name              = "${var.name}-alice"
   engine            = data.aws_rds_engine_version.postgresql.engine
@@ -192,14 +173,8 @@ module "rds-aurora-alice" {
   db_subnet_group_name = local.database_subnet_group_name
 
   security_group_ingress_rules = {
-    private-az1 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 0)
-    }
-    private-az2 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 1)
-    }
-    private-az3 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 2)
+    for i, cidr in local.private_subnets_cidr_blocks : "private-az${i + 1}" => {
+      cidr_ipv4 = cidr
     }
   }
 
@@ -210,7 +185,6 @@ module "rds-aurora-alice" {
 
   instances = {
     one = {}
-    two = {}
   }
 
   tags = local.tags
@@ -223,7 +197,7 @@ resource "random_password" "bob" {
 
 module "rds-aurora-bob" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=e0462445344641c69e36dc90f7f96ba18b2cc19e"  # commit hash of version 10.0.2
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-rds-aurora.git?ref=e0462445344641c69e36dc90f7f96ba18b2cc19e" # commit hash of version 10.0.2
 
   name              = "${var.name}-bob"
   engine            = data.aws_rds_engine_version.postgresql.engine
@@ -240,14 +214,8 @@ module "rds-aurora-bob" {
   db_subnet_group_name = local.database_subnet_group_name
 
   security_group_ingress_rules = {
-    private-az1 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 0)
-    }
-    private-az2 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 1)
-    }
-    private-az3 = {
-      cidr_ipv4 = element(local.private_subnets_cidr_blocks, 2)
+    for i, cidr in local.private_subnets_cidr_blocks : "private-az${i + 1}" => {
+      cidr_ipv4 = cidr
     }
   }
 
@@ -258,7 +226,6 @@ module "rds-aurora-bob" {
 
   instances = {
     one = {}
-    two = {}
   }
 
   tags = local.tags
@@ -280,7 +247,7 @@ resource "aws_iam_policy" "edc_policy" {
           "s3:ListMultipartUploadParts",
           "s3:PutObject",
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           "${module.s3-bucket-alice.s3_bucket_arn}",
           "${module.s3-bucket-alice.s3_bucket_arn}/*",
@@ -301,12 +268,12 @@ resource "aws_iam_policy" "edc_policy" {
 
 module "iam_user" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-user?ref=7279fc444aed7e36c60438b46972e1611e48984c"  # commit hash of version 6.2.3
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-user?ref=7279fc444aed7e36c60438b46972e1611e48984c" # commit hash of version 6.2.3
 
   name          = var.name
   force_destroy = true
-  policies      = {
-    edc_policy  = aws_iam_policy.edc_policy.arn
+  policies = {
+    edc_policy = aws_iam_policy.edc_policy.arn
   }
 
   create_login_profile = false
@@ -316,7 +283,7 @@ module "iam_user" {
 
 module "s3-bucket-alice" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=3170c8beeb346b53c10a3ac2164e637ed161f828"  # commit hash of version 5.9.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=3170c8beeb346b53c10a3ac2164e637ed161f828" # commit hash of version 5.9.1
 
   bucket = "${var.name}-alice-${random_string.this.id}"
 
@@ -325,7 +292,7 @@ module "s3-bucket-alice" {
 
 module "s3-bucket-bob" {
 
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=3170c8beeb346b53c10a3ac2164e637ed161f828"  # commit hash of version 5.9.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=3170c8beeb346b53c10a3ac2164e637ed161f828" # commit hash of version 5.9.1
 
   bucket = "${var.name}-bob-${random_string.this.id}"
 
@@ -334,13 +301,13 @@ module "s3-bucket-bob" {
 
 module "ecr" {
 
-  source   = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=9286de9f9bf6c602f77fa97d27b8ec3939402116"  # commit hash of version 3.1.1
+  source   = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=9286de9f9bf6c602f77fa97d27b8ec3939402116" # commit hash of version 3.1.1
   for_each = toset(var.blueprint == "mvd" ? local.mvd_repositories : local.mxd_repositories)
 
   repository_name         = each.key
   repository_force_delete = true
 
-  repository_image_tag_mutability   = "MUTABLE"
+  repository_image_tag_mutability = "MUTABLE"
   repository_read_write_access_arns = [
     local.admin_principal,
     module.iam_user.arn
@@ -495,7 +462,7 @@ resource "kubernetes_config_map_v1" "aurora_multi_db_init_bob" {
 }
 
 resource "kubernetes_job_v1" "aurora_multi_db_init_bob" {
-  count = var.blueprint == "mvd" ? 1 : 0
+  count      = var.blueprint == "mvd" ? 1 : 0
   depends_on = [module.rds-aurora-bob.cluster_instances]
 
   metadata {
@@ -507,8 +474,8 @@ resource "kubernetes_job_v1" "aurora_multi_db_init_bob" {
       metadata {}
       spec {
         container {
-          name  = "postgres-client"
-          image = "postgres:17.7"
+          name    = "postgres-client"
+          image   = "postgres:17.7"
           command = ["psql"]
           args = [
             "-h", module.rds-aurora-bob.cluster_endpoint,
