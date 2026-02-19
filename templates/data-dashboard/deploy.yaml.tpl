@@ -46,14 +46,14 @@ data:
         "did": "did:web:provider-identityhub%3A7083:provider"
       },
       {
-        "connectorName": "Provider Manufacturing",
-        "managementUrl": "https://${NLB_ADDRESS}/provider-manufacturing/cp/api/management",
-        "defaultUrl": "https://${NLB_ADDRESS}/provider-manufacturing/health/api",
-        "protocolUrl": "http://provider-manufacturing-controlplane:8082/api/dsp",
+        "connectorName": "CTAG",
+        "managementUrl": "https://${NLB_ADDRESS}/ctag/cp/api/management",
+        "defaultUrl": "https://${NLB_ADDRESS}/ctag/health/api",
+        "protocolUrl": "http://ctag-controlplane:8082/api/dsp",
         "apiToken": "${EDC_AUTH_KEY}",
-        "controlUrl": "http://provider-manufacturing-controlplane:8083/api/control",
+        "controlUrl": "http://ctag-controlplane:8083/api/control",
         "federatedCatalogEnabled": false,
-        "federatedCatalogUrl": "https://${NLB_ADDRESS}/provider-manufacturing/fc/api/catalog",
+        "federatedCatalogUrl": "https://${NLB_ADDRESS}/ctag/fc/api/catalog",
         "did": "did:web:provider-identityhub%3A7083:provider"
       }
     ]
