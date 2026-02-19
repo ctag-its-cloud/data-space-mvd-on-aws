@@ -21,7 +21,7 @@ MXD_COMMIT="8795f19273471194f092f1d1c618d780c69f2a4b"
 MVD_COMMIT="e3ccd83bb620e0766c37f333f21acdaf4adcabe1"
 
 # Eclipse   state from 2025-12-02 for DataDashboard
-DATA_DASHBOARD_COMMIT="4921ba32c97ac8b074f7ffc8693300d4971ce329"
+DATA_DASHBOARD_COMMIT="88b6d8c187f9f83e443a6e0e93ad2dd72a48ab0b"
 
 # ---
 
@@ -207,7 +207,7 @@ function deploy_blueprint_mvd {
     cd ../
 
     if [ ! -d "DataDashboard" ]; then
-        git clone https://github.com/eclipse-edc/DataDashboard.git
+        git clone https://github.com/ctag-its-cloud/data-space-dashboard.git
     fi
 
     cd DataDashboard/
