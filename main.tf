@@ -77,13 +77,13 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    baseline = {
+    mng_ondemand = {
       instance_types = ["t3a.medium"]
-      capacity_type  = "ON_DEMAND"
+      #     capacity_type  = "SPOT"
 
-      min_size     = 2
+      min_size     = 1
       max_size     = 3
-      desired_size = 3
+      desired_size = 2
 
       block_device_mappings = {
         xvda = {
@@ -210,6 +210,7 @@ module "rds-aurora-alice" {
 
   instances = {
     one = {}
+    two = {}
   }
 
   tags = local.tags
@@ -257,6 +258,7 @@ module "rds-aurora-bob" {
 
   instances = {
     one = {}
+    two = {}
   }
 
   tags = local.tags
