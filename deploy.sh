@@ -140,12 +140,12 @@ function deploy_blueprint_mxd {
 function deploy_blueprint_mvd {
     # Clone Eclipse MVD repository and pin commit
 
-    # if [ ! -d "MinimumViableDataspace" ]; then
-    #     git clone https://github.com/eclipse-edc/MinimumViableDataspace.git
-    # fi
+    if [ ! -d "MinimumViableDataspace" ]; then
+        git clone https://github.com/eclipse-edc/MinimumViableDataspace.git
+    fi
 
     cd MinimumViableDataspace/
-    # git checkout "${MVD_COMMIT}"
+    git checkout "${MVD_COMMIT}"
 
     # Build MVD container images
 
