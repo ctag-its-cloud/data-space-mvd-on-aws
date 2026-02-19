@@ -78,7 +78,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     baseline = {
-      instance_types = ["t3a.small"]
+      instance_types = ["t3a.medium"]
       capacity_type  = "ON_DEMAND"
 
       min_size     = 1
