@@ -206,7 +206,7 @@ module "rds-aurora-alice" {
   apply_immediately   = true
   skip_final_snapshot = true
 
-  cluster_instance_class = "db.t4g.small"
+  cluster_instance_class = "db.t4g.medium"
 
   instances = {
     one = {}
@@ -253,7 +253,7 @@ module "rds-aurora-bob" {
   apply_immediately   = true
   skip_final_snapshot = true
 
-  cluster_instance_class = "db.t4g.small"
+  cluster_instance_class = "db.t4g.medium"
 
   instances = {
     one = {}
