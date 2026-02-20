@@ -4,6 +4,13 @@
 terraform {
   required_version = ">= 1.14.3"
 
+  backend "s3" {
+    bucket  = "terraform-state-303983718374"
+    key     = "mvd-on-aws.tfstate"
+    region  = "eu-central-1"
+    encrypt = true
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
