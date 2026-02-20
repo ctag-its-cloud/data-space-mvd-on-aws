@@ -24,7 +24,7 @@ data:
   edc-connector-config.json: |
     [
       {
-        "connectorName": "Consumer",
+        "connectorName": "ITA",
         "managementUrl": "https://${NLB_ADDRESS}/consumer/cp/api/management",
         "defaultUrl": "https://${NLB_ADDRESS}/consumer/health/api",
         "protocolUrl": "http://consumer-controlplane:8082/api/dsp",
@@ -35,7 +35,7 @@ data:
         "did": "did:web:consumer-identityhub%3A7083:consumer"
       },
       {
-        "connectorName": "Provider Q&A",
+        "connectorName": "AVANZA",
         "managementUrl": "https://${NLB_ADDRESS}/provider-qna/cp/api/management",
         "defaultUrl": "https://${NLB_ADDRESS}/provider-qna/health/api",
         "protocolUrl": "http://provider-qna-controlplane:8082/api/dsp",
