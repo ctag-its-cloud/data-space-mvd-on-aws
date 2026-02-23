@@ -5,11 +5,11 @@ terraform {
   required_version = ">= 1.14.3"
 
   backend "s3" {
-    bucket         = "terraform-state-303983718374"
+    bucket         = "terraform-state-516466084434"
     key            = "mvd-on-aws.tfstate"
     region         = "eu-central-1"
     encrypt        = true
-    dynamodb_table = "terraform-state-lock-303983718374"
+    dynamodb_table = "terraform-state-lock-516466084434"
   }
 
   required_providers {

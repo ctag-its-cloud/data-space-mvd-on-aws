@@ -34,6 +34,8 @@ function create_mvd {
     echo "Please enter an alphanumeric string to protect access to your connector APIs."
     read -s -p "EDC authentication key: " edc_auth_key
     echo
+    echo "Please enter the AWS Account ID:"
+    read account_id
 
     # Ensure AWSServiceRoleForAutoScaling exists to prevent https://github.com/hashicorp/terraform-provider-aws/issues/28644
     if ! aws iam get-role --role-name AWSServiceRoleForAutoScaling >/dev/null 2>&1; then
@@ -42,8 +44,17 @@ function create_mvd {
 
     blueprint="$1"
 
-    terraform init
-    terraform apply -auto-approve -var name="${PROJECT_NAME}" -var region="${AWS_REGION}" -var blueprint="${blueprint}" -var existing_vpc_id="${VPC_ID}"
+    terraform init \
+        -backend-config="bucket=terraform-state-${account_id}" \
+        -backend-config="dynamodb_table=terraform-state-lock-${account_id}"
+
+    terraform apply -auto-approve \
+        -var name="${PROJECT_NAME}" \
+        -var region="${AWS_REGION}" \
+        -var blueprint="${blueprint}" \
+        -var existing_vpc_id="${VPC_ID}" \
+        -var account_id="${account_id}"
+
 
     aws eks update-kubeconfig --region "${AWS_REGION}" --name "${PROJECT_NAME}"
 
@@ -231,7 +242,16 @@ function deploy_blueprint_mvd {
 function delete_mvd {
     echo -e "${CY}Deleting Minimum Viable Dataspace on AWS...${NC}"
 
-    terraform destroy -auto-approve
+    echo "Please enter the AWS Account ID:"
+    read account_id
+
+    terraform init \
+        -backend-config="bucket=terraform-state-${account_id}" \
+        -backend-config="dynamodb_table=terraform-state-lock-${account_id}"
+
+    terraform destroy -auto-approve -var account_id="${account_id}"
+
+
 
     if [ -d "tutorial-resources" ];     then rm -rf tutorial-resources; fi
     if [ -d "MinimumViableDataspace" ]; then rm -rf MinimumViableDataspace; fi
