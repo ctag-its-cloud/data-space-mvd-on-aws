@@ -16,3 +16,9 @@ variable "blueprint" {
 variable "existing_vpc_id" {
   default = ""
 }
+
+variable "account_id" {
+  type    = string
+  default = ""
+}
+
