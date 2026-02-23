@@ -13,3 +13,10 @@ MinimumViableDataspace
 
 # eclipse-edc/DataDashboard clone
 DataDashboard
+
+# Crash logs
+crash.log
+
+# Terraform variables
+*.tfvars
+*.tfvars.json
