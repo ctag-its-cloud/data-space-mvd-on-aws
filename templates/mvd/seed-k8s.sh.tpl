@@ -20,8 +20,8 @@
 ## Seed application DATA to both connectors
 echo
 echo
-echo "Seed data to 'provider-qna' and 'provider-manufacturing'"
-for url in 'https://NLB_ADDRESS/provider-manufacturing/cp' 'https://NLB_ADDRESS/provider-qna/cp'
+echo "Seed data to 'avanza' and 'ctag'"
+for url in 'https://NLB_ADDRESS/ctag/cp' 'https://NLB_ADDRESS/avanza/cp'
 do
   newman run \
     --folder "Seed" \
@@ -37,8 +37,8 @@ echo "Create linked assets on the Catalog Server"
 newman run \
   --folder "Seed Catalog Server" \
   --env-var "HOST=https://NLB_ADDRESS/provider-catalog-server/cp" \
-  --env-var "PROVIDER_QNA_DSP_URL=http://provider-qna-controlplane:8082" \
-  --env-var "PROVIDER_MF_DSP_URL=http://provider-manufacturing-controlplane:8082" \
+  --env-var "PROVIDER_QNA_DSP_URL=http://avanza-controlplane:8082" \
+  --env-var "PROVIDER_MF_DSP_URL=http://ctag-controlplane:8082" \
   ./deployment/postman/MVD.postman_collection.json \
   --insecure
 
@@ -49,7 +49,7 @@ API_KEY="c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
 echo
 echo
 echo "Create consumer participant context in IdentityHub"
-CONSUMER_CONTROLPLANE_SERVICE_URL="http://consumer-controlplane:8082"
+CONSUMER_CONTROLPLANE_SERVICE_URL="http://ita-controlplane:8082"
 CONSUMER_IDENTITYHUB_URL="http://consumer-identityhub:7082"
 DATA_CONSUMER=$(jq -n --arg url "$CONSUMER_CONTROLPLANE_SERVICE_URL" --arg ihurl "$CONSUMER_IDENTITYHUB_URL" '{
            "roles":[],
@@ -77,7 +77,7 @@ DATA_CONSUMER=$(jq -n --arg url "$CONSUMER_CONTROLPLANE_SERVICE_URL" --arg ihurl
            }
        }')
 
-curl -k --location "https://NLB_ADDRESS/consumer/cs/api/identity/v1alpha/participants/" \
+curl -k --location "https://NLB_ADDRESS/ita/cs/api/identity/v1alpha/participants/" \
 --header 'Content-Type: application/json' \
 --header "x-api-key: $API_KEY" \
 --data "$DATA_CONSUMER"

@@ -6,16 +6,16 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    # Quitamos /consumer-dp del path y dejamos /api/public...
+    # Quitamos /ita-dp del path y dejamos /api/public...
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - http:
         paths:
-          - path: /consumer-dp(/|$)(.*)
+          - path: /ita-dp(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: consumer-dataplane
+                name: ita-dataplane
                 port:
                   number: 11002

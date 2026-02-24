@@ -17,7 +17,7 @@
 # consumer connector
 module "consumer-connector" {
   source            = "./modules/connector"
-  humanReadableName = "consumer"
+  humanReadableName = "ita"
   participantId     = var.consumer-did
   database = {
     user     = "postgres"
@@ -38,7 +38,7 @@ module "consumer-identityhub" {
   humanReadableName = "consumer-identityhub"
   participantId     = var.consumer-did
   vault-url         = "http://consumer-vault:8200"
-  service-name      = "consumer"
+  service-name      = "ita"
   database = {
     user     = "postgres"
     password = "ALICE_DB_PASSWORD"

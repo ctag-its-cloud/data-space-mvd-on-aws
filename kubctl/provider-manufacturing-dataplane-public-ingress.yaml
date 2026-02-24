@@ -6,16 +6,16 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    # Quitamos /provider-manufacturing-dp del path y dejamos /api/public...
+    # Quitamos /ctag-dp del path y dejamos /api/public...
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - http:
         paths:
-          - path: /provider-manufacturing-dp(/|$)(.*)
+          - path: /ctag-dp(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: provider-manufacturing-dataplane
+                name: ctag-dataplane
                 port:
                   number: 11002

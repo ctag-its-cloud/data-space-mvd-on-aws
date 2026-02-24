@@ -18,7 +18,7 @@
 # first provider connector "provider-qna"
 module "provider-qna-connector" {
   source            = "./modules/connector"
-  humanReadableName = "provider-qna"
+  humanReadableName = "avanza"
   participantId     = var.provider-did
   database = {
     user     = "postgres"
@@ -34,7 +34,7 @@ module "provider-qna-connector" {
 # Second provider connector "provider-manufacturing"
 module "provider-manufacturing-connector" {
   source            = "./modules/connector"
-  humanReadableName = "provider-manufacturing"
+  humanReadableName = "ctag"
   participantId     = var.provider-did
   database = {
     user     = "postgres"
