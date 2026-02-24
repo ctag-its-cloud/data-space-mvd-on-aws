@@ -20,8 +20,8 @@
 ## Seed application DATA to both connectors
 echo
 echo
-echo "Seed data to 'provider-qna' and 'provider-manufacturing'"
-for url in 'https://NLB_ADDRESS/provider-manufacturing/cp' 'https://NLB_ADDRESS/provider-qna/cp'
+echo "Seed data to 'avanza' and 'ctag'"
+for url in 'https://NLB_ADDRESS/ctag/cp' 'https://NLB_ADDRESS/avanza/cp'
 do
   newman run \
     --folder "Seed" \
@@ -37,50 +37,50 @@ echo "Create linked assets on the Catalog Server"
 newman run \
   --folder "Seed Catalog Server" \
   --env-var "HOST=https://NLB_ADDRESS/provider-catalog-server/cp" \
-  --env-var "PROVIDER_QNA_DSP_URL=http://provider-qna-controlplane:8082" \
-  --env-var "PROVIDER_MF_DSP_URL=http://provider-manufacturing-controlplane:8082" \
+  --env-var "PROVIDER_QNA_DSP_URL=http://avanza-controlplane:8082" \
+  --env-var "PROVIDER_MF_DSP_URL=http://ctag-controlplane:8082" \
   ./deployment/postman/MVD.postman_collection.json \
   --insecure
 
 ## Seed management DATA to identityhubsl
 API_KEY="c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo="
 
-# add consumer participant
+# add ita participant
 echo
 echo
-echo "Create consumer participant context in IdentityHub"
-CONSUMER_CONTROLPLANE_SERVICE_URL="http://consumer-controlplane:8082"
-CONSUMER_IDENTITYHUB_URL="http://consumer-identityhub:7082"
-DATA_CONSUMER=$(jq -n --arg url "$CONSUMER_CONTROLPLANE_SERVICE_URL" --arg ihurl "$CONSUMER_IDENTITYHUB_URL" '{
+echo "Create ita participant context in IdentityHub"
+ITA_CONTROLPLANE_SERVICE_URL="http://ita-controlplane:8082"
+ITA_IDENTITYHUB_URL="http://ita-identityhub:7082"
+DATA_ITA=$(jq -n --arg url "$ITA_CONTROLPLANE_SERVICE_URL" --arg ihurl "$ITA_IDENTITYHUB_URL" '{
            "roles":[],
            "serviceEndpoints":[
              {
                 "type": "CredentialService",
                 "serviceEndpoint": "\($ihurl)/api/credentials/v1/participants/ZGlkOndlYjpjb25zdW1lci1pZGVudGl0eWh1YiUzQTcwODM6Y29uc3VtZXI=",
-                "id": "consumer-credentialservice-1"
+                "id": "ita-credentialservice-1"
              },
              {
                 "type": "ProtocolEndpoint",
                 "serviceEndpoint": "\($url)/api/dsp",
-                "id": "consumer-dsp"
+                "id": "ita-dsp"
              }
            ],
            "active": true,
-           "participantId": "did:web:consumer-identityhub%3A7083:consumer",
-           "did": "did:web:consumer-identityhub%3A7083:consumer",
+           "participantId": "did:web:ita-identityhub%3A7083:ita",
+           "did": "did:web:ita-identityhub%3A7083:ita",
            "key":{
-               "keyId": "did:web:consumer-identityhub%3A7083:consumer#key-1",
-               "privateKeyAlias": "did:web:consumer-identityhub%3A7083:consumer#key-1",
+               "keyId": "did:web:ita-identityhub%3A7083:ita#key-1",
+               "privateKeyAlias": "did:web:ita-identityhub%3A7083:ita#key-1",
                "keyGeneratorParams":{
                   "algorithm": "EC"
                }
            }
        }')
 
-curl -k --location "https://NLB_ADDRESS/consumer/cs/api/identity/v1alpha/participants/" \
+curl -k --location "https://NLB_ADDRESS/ita/cs/api/identity/v1alpha/participants/" \
 --header 'Content-Type: application/json' \
 --header "x-api-key: $API_KEY" \
---data "$DATA_CONSUMER"
+--data "$DATA_ITA"
 
 
 # add provider participant
@@ -158,8 +158,8 @@ curl -k -s --location 'https://NLB_ADDRESS/issuer/cs/api/identity/v1alpha/partic
 newman run \
   --folder "Seed Issuer SQL" \
   --env-var "ISSUER_ADMIN_URL=https://NLB_ADDRESS/issuer/ad" \
-  --env-var "CONSUMER_ID=did:web:consumer-identityhub%3A7083:consumer" \
-  --env-var "CONSUMER_NAME=MVD Consumer Participant" \
+  --env-var "ITA_ID=did:web:ita-identityhub%3A7083:ita" \
+  --env-var "ITA_NAME=MVD Ita Participant" \
   --env-var "PROVIDER_ID=did:web:provider-identityhub%3A7083:provider" \
   --env-var "PROVIDER_NAME=MVD Provider Participant" \
   ./deployment/postman/MVD.postman_collection.json \

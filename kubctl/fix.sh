@@ -17,26 +17,26 @@ fi
 echo "Using Hostname: $LB_HOST"
 
 # Apply Ingress configurations
-kubectl apply -f consumer-dataplane-public-ingress.yaml
-kubectl apply -f provider-qna-dataplane-public-ingress.yaml
-kubectl apply -f provider-manufacturing-dataplane-public-ingress.yaml
+kubectl apply -f ita-dataplane-public-ingress.yaml
+kubectl apply -f avanza-dataplane-public-ingress.yaml
+kubectl apply -f ctag-dataplane-public-ingress.yaml
 
 # Set environment variables for all three connectors
 echo "Updating environment variables..."
 
-kubectl -n mvd set env deploy/consumer-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/consumer-dp/api/public"
+kubectl -n mvd set env deploy/ita-dataplane \
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/ita-dp/api/public"
 
-kubectl -n mvd set env deploy/provider-qna-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/provider-qna-dp/api/public"
+kubectl -n mvd set env deploy/avanza-dataplane \
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/avanza-dp/api/public"
 
-kubectl -n mvd set env deploy/provider-manufacturing-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/provider-manufacturing-dp/api/public"
+kubectl -n mvd set env deploy/ctag-dataplane \
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/ctag-dp/api/public"
 
 # Restart deployments to apply changes
 echo "Restarting deployments..."
-kubectl -n mvd rollout restart deploy/consumer-dataplane
-kubectl -n mvd rollout restart deploy/provider-qna-dataplane
-kubectl -n mvd rollout restart deploy/provider-manufacturing-dataplane
+kubectl -n mvd rollout restart deploy/ita-dataplane
+kubectl -n mvd rollout restart deploy/avanza-dataplane
+kubectl -n mvd rollout restart deploy/ctag-dataplane
 
 echo "Done! Connectors are being updated."

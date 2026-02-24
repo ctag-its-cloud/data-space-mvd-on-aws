@@ -15,10 +15,10 @@
 # This file deploys all the components needed for the provider side of the scenario,
 # i.e. a catalog server ("bob"), two connectors ("ted" and "carol") as well as one identityhub and one vault
 
-# first provider connector "provider-qna"
-module "provider-qna-connector" {
+# first provider connector "avanza"
+module "avanza-connector" {
   source            = "./modules/connector"
-  humanReadableName = "provider-qna"
+  humanReadableName = "avanza"
   participantId     = var.provider-did
   database = {
     user     = "postgres"
@@ -31,10 +31,10 @@ module "provider-qna-connector" {
   useSVE        = var.useSVE
 }
 
-# Second provider connector "provider-manufacturing"
-module "provider-manufacturing-connector" {
+# Second provider connector "ctag"
+module "ctag-connector" {
   source            = "./modules/connector"
-  humanReadableName = "provider-manufacturing"
+  humanReadableName = "ctag"
   participantId     = var.provider-did
   database = {
     user     = "postgres"

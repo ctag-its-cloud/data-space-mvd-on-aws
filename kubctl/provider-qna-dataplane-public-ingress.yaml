@@ -1,21 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: provider-qna-dataplane-public
+  name: avanza-dataplane-public
   namespace: mvd
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    # Quitamos /provider-qna-dp del path y dejamos /api/public...
+    # Quitamos /avanza-dp del path y dejamos /api/public...
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - http:
         paths:
-          - path: /provider-qna-dp(/|$)(.*)
+          - path: /avanza-dp(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: provider-qna-dataplane
+                name: avanza-dataplane
                 port:
                   number: 11002
