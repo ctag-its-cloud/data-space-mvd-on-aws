@@ -1,21 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ctag-dataplane-public
+  name: provider-manufacturing-dataplane-public
   namespace: mvd
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
-    # Quitamos /ctag-dp del path y dejamos /api/public...
+    # Quitamos /provider-manufacturing-dp del path y dejamos /api/public...
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - http:
         paths:
-          - path: /ctag-dp(/|$)(.*)
+          - path: /provider-manufacturing-dp(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: ctag-dataplane
+                name: provider-manufacturing-dataplane
                 port:
                   number: 11002
