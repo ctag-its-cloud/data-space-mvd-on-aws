@@ -125,6 +125,13 @@ metadata:
   namespace: mvd
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($http_x_forwarded_proto = 'http') {
+        return 301 https://$host$request_uri;
+      }
+      location = / {
+        return 301 https://$host/dashboard/home;
+      }
 spec:
   ingressClassName: nginx
   rules:

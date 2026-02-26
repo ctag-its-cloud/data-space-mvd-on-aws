@@ -22,3 +22,7 @@ variable "account_id" {
   default = ""
 }
 
+variable "certificate_arn" {
+  description = "Existing ACM Certificate ARN. If empty, a self-signed cert will be created."
+  default     = ""
+}

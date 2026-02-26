@@ -373,6 +373,10 @@ resource "aws_acm_certificate" "nlb" {
   certificate_body = tls_self_signed_cert.this.cert_pem
 }
 
+locals {
+  target_cert_arn = var.certificate_arn != "" ? var.certificate_arn : aws_acm_certificate.nlb.arn
+}
+
 data "aws_eks_cluster" "this" {
   name = module.eks.cluster_name
   depends_on = [
@@ -423,12 +427,15 @@ resource "helm_release" "ingress_nginx" {
     yamlencode({
 
       controller = {
+        config = {
+          "use-forwarded-headers" = "true"
+        }
         service = {
           annotations = {
             "service.beta.kubernetes.io/aws-load-balancer-type"                              = "nlb",
             "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled" = "true",
             "service.beta.kubernetes.io/aws-load-balancer-ssl-ports"                         = "https",
-            "service.beta.kubernetes.io/aws-load-balancer-ssl-cert"                          = aws_acm_certificate.nlb.arn,
+            "service.beta.kubernetes.io/aws-load-balancer-ssl-cert"                          = local.target_cert_arn,
             "service.beta.kubernetes.io/aws-load-balancer-backend-protocol"                  = "http",
           },
           targetPorts = {

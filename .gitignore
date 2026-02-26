@@ -20,3 +20,5 @@ crash.log
 # Terraform variables
 *.tfvars
 *.tfvars.json
+
+.env

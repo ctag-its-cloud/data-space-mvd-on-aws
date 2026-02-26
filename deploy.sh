@@ -28,14 +28,28 @@ DATA_DASHBOARD_COMMIT="88b6d8c187f9f83e443a6e0e93ad2dd72a48ab0b"
 # If local Kubernetes credentials exist, make sure Terraform Helm provider uses them
 if [ -f "${HOME}/.kube/config" ]; then export KUBE_CONFIG_PATH="${HOME}/.kube/config"; fi
 
+# Load environment variables from .env file if it exists
+if [ -f ".env" ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 function create_mvd {
     echo -e "${CY}Creating Minimum Viable Dataspace on AWS...${NC}"
 
-    echo "Please enter an alphanumeric string to protect access to your connector APIs."
-    read -s -p "EDC authentication key: " edc_auth_key
-    echo
-    echo "Please enter the AWS Account ID:"
-    read account_id
+    if [ -z "$EDC_AUTH_KEY" ]; then
+        echo "Please enter an alphanumeric string to protect access to your connector APIs."
+        read -s -p "EDC authentication key: " edc_auth_key
+        echo
+    else
+        edc_auth_key="$EDC_AUTH_KEY"
+    fi
+
+    if [ -z "$AWS_ACCOUNT_ID" ]; then
+        echo "Please enter the AWS Account ID:"
+        read account_id
+    else
+        account_id="$AWS_ACCOUNT_ID"
+    fi
 
     # Ensure AWSServiceRoleForAutoScaling exists to prevent https://github.com/hashicorp/terraform-provider-aws/issues/28644
     if ! aws iam get-role --role-name AWSServiceRoleForAutoScaling >/dev/null 2>&1; then
@@ -53,7 +67,8 @@ function create_mvd {
         -var region="${AWS_REGION}" \
         -var blueprint="${blueprint}" \
         -var existing_vpc_id="${VPC_ID}" \
-        -var account_id="${account_id}"
+        -var account_id="${account_id}" \
+        -var certificate_arn="${CERTIFICATE_ARN}"
 
 
     aws eks update-kubeconfig --region "${AWS_REGION}" --name "${PROJECT_NAME}"
@@ -242,8 +257,12 @@ function deploy_blueprint_mvd {
 function delete_mvd {
     echo -e "${CY}Deleting Minimum Viable Dataspace on AWS...${NC}"
 
-    echo "Please enter the AWS Account ID:"
-    read account_id
+    if [ -z "$AWS_ACCOUNT_ID" ]; then
+        echo "Please enter the AWS Account ID:"
+        read account_id
+    else
+        account_id="$AWS_ACCOUNT_ID"
+    fi
 
     terraform init \
         -backend-config="bucket=terraform-state-${account_id}" \
