@@ -125,19 +125,21 @@ metadata:
   namespace: mvd
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/server-snippet: |
-      if ($http_x_forwarded_proto = 'http') {
-        return 301 https://$host$request_uri;
-      }
-      location = / {
-        return 301 https://$host/dashboard/home;
-      }
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/app-root: /dashboard/home
 spec:
   ingressClassName: nginx
   rules:
   - http:
       paths:
       - path: /dashboard(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: data-dashboard
+            port:
+              number: 8080
+      - path: /()(.*)
         pathType: ImplementationSpecific
         backend:
           service:
