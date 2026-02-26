@@ -25,35 +25,35 @@ data:
     [
       {
         "connectorName": "ITA",
-        "managementUrl": "https://${NLB_ADDRESS}/ita/cp/api/management",
-        "defaultUrl": "https://${NLB_ADDRESS}/ita/health/api",
+        "managementUrl": "/ita/cp/api/management",
+        "defaultUrl": "/ita/health/api",
         "protocolUrl": "http://ita-controlplane:8082/api/dsp",
         "apiToken": "${EDC_AUTH_KEY}",
         "controlUrl": "http://ita-controlplane:8083/api/control",
         "federatedCatalogEnabled": false,
-        "federatedCatalogUrl": "https://${NLB_ADDRESS}/ita/fc/api/catalog",
+        "federatedCatalogUrl": "/ita/fc/api/catalog",
         "did": "did:web:consumer-identityhub%3A7083:consumer"
       },
       {
         "connectorName": "AVANZA",
-        "managementUrl": "https://${NLB_ADDRESS}/avanza/cp/api/management",
-        "defaultUrl": "https://${NLB_ADDRESS}/avanza/health/api",
+        "managementUrl": "/avanza/cp/api/management",
+        "defaultUrl": "/avanza/health/api",
         "protocolUrl": "http://avanza-controlplane:8082/api/dsp",
         "apiToken": "${EDC_AUTH_KEY}",
         "controlUrl": "http://avanza-controlplane:8083/api/control",
         "federatedCatalogEnabled": false,
-        "federatedCatalogUrl": "https://${NLB_ADDRESS}/avanza/fc/api/catalog",
+        "federatedCatalogUrl": "/avanza/fc/api/catalog",
         "did": "did:web:provider-identityhub%3A7083:provider"
       },
       {
         "connectorName": "CTAG",
-        "managementUrl": "https://${NLB_ADDRESS}/ctag/cp/api/management",
-        "defaultUrl": "https://${NLB_ADDRESS}/ctag/health/api",
+        "managementUrl": "/ctag/cp/api/management",
+        "defaultUrl": "/ctag/health/api",
         "protocolUrl": "http://ctag-controlplane:8082/api/dsp",
         "apiToken": "${EDC_AUTH_KEY}",
         "controlUrl": "http://ctag-controlplane:8083/api/control",
         "federatedCatalogEnabled": false,
-        "federatedCatalogUrl": "https://${NLB_ADDRESS}/ctag/fc/api/catalog",
+        "federatedCatalogUrl": "/ctag/fc/api/catalog",
         "did": "did:web:provider-identityhub%3A7083:provider"
       }
     ]

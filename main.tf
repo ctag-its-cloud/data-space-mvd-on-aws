@@ -355,8 +355,8 @@ resource "tls_self_signed_cert" "this" {
   private_key_pem = tls_private_key.this.private_key_pem
 
   subject {
-    common_name  = "mvd.example.com"
-    organization = "ACME Examples, Inc"
+    common_name  = "sandbox-poc.ctag-digizty.com"
+    organization = "CTAG"
   }
 
   validity_period_hours = 720
