@@ -355,7 +355,7 @@ resource "tls_self_signed_cert" "this" {
   private_key_pem = tls_private_key.this.private_key_pem
 
   subject {
-    common_name  = "sandbox-poc.ctag-digizty.com"
+    common_name  = "edc.ctag.com"
     organization = "CTAG"
   }
 
