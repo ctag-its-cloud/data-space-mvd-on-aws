@@ -20,11 +20,11 @@ kubectl apply -f provider-manufacturing-dataplane-public-ingress.yaml
 # Set environment variables for all three connectors
 echo "Updating environment variables..."
 kubectl -n mvd set env deploy/ita-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/ita-dp/api/public"
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="/ita-dp/api/public"
 kubectl -n mvd set env deploy/avanza-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/avanza-dp/api/public"
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="/avanza-dp/api/public"
 kubectl -n mvd set env deploy/ctag-dataplane \
-  EDC_DATAPLANE_API_PUBLIC_BASEURL="https://${LB_HOST}/ctag-dp/api/public"
+  EDC_DATAPLANE_API_PUBLIC_BASEURL="/ctag-dp/api/public"
 # Restart deployments to apply changes
 echo "Restarting deployments..."
 kubectl -n mvd rollout restart deploy/ita-dataplane
