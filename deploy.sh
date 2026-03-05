@@ -367,6 +367,16 @@ function delete_mvd {
         account_id="$AWS_ACCOUNT_ID"
     fi
 
+    if [ -z "$WITH_BACKUP" ]; then
+        echo "Do you want to create database backup on mvd down and restore it on mvd up? (y/n):"
+        read with_backup_input
+        if [[ "$with_backup_input" == "y" ]]; then
+            WITH_BACKUP=true
+        else
+            WITH_BACKUP=false
+        fi
+    fi
+
     terraform init \
         -backend-config="bucket=terraform-state-${account_id}" \
         -backend-config="dynamodb_table=terraform-state-lock-${account_id}"
