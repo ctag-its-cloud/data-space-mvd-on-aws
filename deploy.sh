@@ -44,6 +44,16 @@ function create_mvd {
         edc_auth_key="$EDC_AUTH_KEY"
     fi
 
+    if [ -z "$WITH_BACKUP" ]; then
+        echo "Do you want to create database backup on mvd down and restore it on mvd up? (y/n):"
+        read with_backup_input
+        if [[ "$with_backup_input" == "y" ]]; then
+            WITH_BACKUP=true
+        else
+            WITH_BACKUP=false
+        fi
+    fi
+
     if [ -z "$AWS_ACCOUNT_ID" ]; then
         echo "Please enter the AWS Account ID:"
         read account_id
@@ -72,6 +82,10 @@ function create_mvd {
 
 
     aws eks update-kubeconfig --region "${AWS_REGION}" --name "${PROJECT_NAME}"
+
+    if [[ "$WITH_BACKUP" == "true" ]]; then
+        restore_databases
+    fi
 
     # Fetch Terraform outputs
 
@@ -254,6 +268,95 @@ function deploy_blueprint_mvd {
     kubectl apply -f deploy.yaml
 }
 
+function backup_databases {
+    echo -e "${CY}Backing up databases...${NC}"
+    mkdir -p backups
+
+    # Ensure we have kubeconfig
+    aws eks update-kubeconfig --region "${AWS_REGION}" --name "${PROJECT_NAME}" > /dev/null 2>&1 || true
+
+    # Check if we can reach the cluster
+    if ! kubectl get nodes > /dev/null 2>&1; then
+        echo -e "${CY}Could not connect to EKS cluster. Skipping backup.${NC}"
+        return
+    fi
+
+    # Get endpoints and passwords
+    alice_db_endpoint=$(terraform output -raw rds-aurora-alice_endpoint 2>/dev/null)
+    alice_db_password=$(terraform output -raw rds-aurora-alice_password 2>/dev/null)
+    bob_db_endpoint=$(terraform output -raw rds-aurora-bob_endpoint 2>/dev/null)
+    bob_db_password=$(terraform output -raw rds-aurora-bob_password 2>/dev/null)
+
+    if [ -z "$alice_db_endpoint" ] || [ -z "$bob_db_endpoint" ]; then
+        echo -e "${CY}Could not fetch RDS endpoints. Skipping backup.${NC}"
+        return
+    fi
+
+    # Create a temporary pod for backup
+    kubectl run db-backup --image=postgres:17.7 --restart=Never -- sleep 600
+    kubectl wait --for=condition=Ready pod/db-backup --timeout=60s
+
+    # Backup Alice
+    echo "Backing up Alice..."
+    kubectl exec db-backup -- bash -c "PGPASSWORD=$alice_db_password pg_dump -h $alice_db_endpoint -U postgres -d alice -F c -f /tmp/alice.dump"
+    kubectl cp db-backup:/tmp/alice.dump backups/alice.dump
+
+    # Backup Bob
+    echo "Backing up Bob..."
+    for db in bob qna manufacturing identity; do
+        echo "  - $db"
+        kubectl exec db-backup -- bash -c "PGPASSWORD=$bob_db_password pg_dump -h $bob_db_endpoint -U postgres -d $db -F c -f /tmp/$db.dump"
+        kubectl cp db-backup:/tmp/$db.dump backups/$db.dump
+    done
+
+    kubectl delete pod db-backup
+    echo -e "${CY}Backup completed and saved in backups/ directory.${NC}"
+}
+
+function restore_databases {
+    echo -e "${CY}Restoring databases...${NC}"
+
+    if [ ! -d "backups" ]; then
+        echo "No backups found in backups/ directory. Skipping restore."
+        return
+    fi
+
+    # Get endpoints and passwords
+    alice_db_endpoint=$(terraform output -raw rds-aurora-alice_endpoint 2>/dev/null)
+    alice_db_password=$(terraform output -raw rds-aurora-alice_password 2>/dev/null)
+    bob_db_endpoint=$(terraform output -raw rds-aurora-bob_endpoint 2>/dev/null)
+    bob_db_password=$(terraform output -raw rds-aurora-bob_password 2>/dev/null)
+
+    if [ -z "$alice_db_endpoint" ] || [ -z "$bob_db_endpoint" ]; then
+        echo -e "${CY}Could not fetch RDS endpoints. Skipping restore.${NC}"
+        return
+    fi
+
+    # Create a temporary pod for restore
+    kubectl run db-restore --image=postgres:17.7 --restart=Never -- sleep 600
+    kubectl wait --for=condition=Ready pod/db-restore --timeout=60s
+
+    # Restore Alice
+    if [ -f "backups/alice.dump" ]; then
+        echo "Restoring Alice..."
+        kubectl cp backups/alice.dump db-restore:/tmp/alice.dump
+        kubectl exec db-restore -- bash -c "PGPASSWORD=$alice_db_password pg_restore -h $alice_db_endpoint -U postgres -d alice --clean --if-exists /tmp/alice.dump"
+    fi
+
+    # Restore Bob
+    echo "Restoring Bob..."
+    for db in bob qna manufacturing identity; do
+        if [ -f "backups/$db.dump" ]; then
+            echo "  - $db"
+            kubectl cp backups/$db.dump db-restore:/tmp/$db.dump
+            kubectl exec db-restore -- bash -c "PGPASSWORD=$bob_db_password pg_restore -h $bob_db_endpoint -U postgres -d $db --clean --if-exists /tmp/$db.dump"
+        fi
+    done
+
+    kubectl delete pod db-restore
+    echo -e "${CY}Restore completed.${NC}"
+}
+
 function delete_mvd {
     echo -e "${CY}Deleting Minimum Viable Dataspace on AWS...${NC}"
 
@@ -267,6 +370,10 @@ function delete_mvd {
     terraform init \
         -backend-config="bucket=terraform-state-${account_id}" \
         -backend-config="dynamodb_table=terraform-state-lock-${account_id}"
+
+    if [[ "$WITH_BACKUP" == "true" ]]; then
+        backup_databases
+    fi
 
     terraform destroy -auto-approve -var account_id="${account_id}"
 
